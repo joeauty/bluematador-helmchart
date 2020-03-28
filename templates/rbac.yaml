@@ -1,0 +1,75 @@
+{{ if .Values.key }}
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: bluematador-agent
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: bluematador-agent
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - events
+  - endpoints
+  - pods
+  - nodes
+  - componentstatuses
+  - persistentvolumes
+  - replicationcontrollers
+  verbs:
+  - get
+  - watch
+  - list
+- apiGroups:
+  - "extensions"
+  - "apps"
+  resources:
+  - deployments
+  - daemonsets
+  - replicasets
+  - statefulsets
+  verbs:
+  - get
+  - watch
+  - list
+- apiGroups:
+  - "extensions"
+  - "batch"
+  resources:
+  - jobs
+  - cronjobs
+  verbs:
+  - get
+  - watch
+  - list
+- nonResourceURLs:
+  - "/version"
+  - "/healthz"
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - nodes/metrics
+  - nodes/spec
+  - nodes/proxy
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: bluematador-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: bluematador-agent
+subjects:
+- kind: ServiceAccount
+  name: bluematador-agent
+  namespace: {{ .Release.Namespace }}
+{{ end }}

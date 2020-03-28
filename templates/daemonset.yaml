@@ -1,0 +1,63 @@
+{{ if .Values.key }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: bluematador-agent
+spec:
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      name: bluematador-agent
+  template:
+    metadata:
+      labels:
+        name: bluematador-agent
+    spec:
+      tolerations:
+       - effect: NoExecute
+         operator: Exists
+       - key: node-role.kubernetes.io/master
+         effect: NoSchedule
+      serviceAccountName: bluematador-agent
+      containers:
+      - name: bluematador-agent
+        image: bluematador/agent:latest
+        imagePullPolicy: Always
+        env:
+          - name: BLUEMATADOR_ACCOUNT
+            value: "da934c7d-201a-4b79-99b9-e3cc077c8e8f"
+          - name: BLUEMATADOR_KEY
+            value: {{ .Values.key | quote }}
+          - name: BLUEMATADOR_KUBERNETES
+            value: "flipgive"
+          - name: BLUEMATADOR_DOCKER
+            value: "true"
+          - name: BLUEMATADOR_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: BLUEMATADOR_POD_NAMESPACE
+            value: {{ .Release.Namespace }}
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        volumeMounts:
+          - name: procdir
+            mountPath: /host/proc
+            readOnly: true
+          - name: cgroups
+            mountPath: /host/sys/fs/cgroup
+            readOnly: true
+      volumes:
+        - hostPath:
+            path: /proc
+          name: procdir
+        - hostPath:
+            path: /sys/fs/cgroup
+          name: cgroups
+{{ end }}
