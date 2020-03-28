@@ -30,7 +30,7 @@ spec:
           - name: BLUEMATADOR_KEY
             value: {{ .Values.key | quote }}
           - name: BLUEMATADOR_KUBERNETES
-            value: "flipgive"
+            value: {{ .Values.cluster | quote }}
           - name: BLUEMATADOR_DOCKER
             value: "true"
           - name: BLUEMATADOR_POD_NAME
@@ -41,11 +41,11 @@ spec:
             value: {{ .Release.Namespace }}
         resources:
           requests:
-            memory: "64Mi"
-            cpu: "50m"
+            memory: {{ .Values.resources.request.memory }}
+            cpu: {{ .Values.resources.request.cpu }}
           limits:
-            memory: "128Mi"
-            cpu: "200m"
+            memory: {{ .Values.resources.limits.memory }}
+            cpu: {{ .Values.resources.limits.cpu }}
         volumeMounts:
           - name: procdir
             mountPath: /host/proc
