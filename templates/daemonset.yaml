@@ -1,4 +1,3 @@
-{{ if .Values.key }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -60,4 +59,3 @@ spec:
         - hostPath:
             path: /sys/fs/cgroup
           name: cgroups
-{{ end }}

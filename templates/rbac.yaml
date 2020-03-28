@@ -1,4 +1,3 @@
-{{ if .Values.key }}
 kind: ServiceAccount
 apiVersion: v1
 metadata:
@@ -72,4 +71,3 @@ subjects:
 - kind: ServiceAccount
   name: bluematador-agent
   namespace: {{ .Release.Namespace }}
-{{ end }}
